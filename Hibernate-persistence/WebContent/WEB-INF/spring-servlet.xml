@@ -1,0 +1,65 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:flex="http://www.springframework.org/schema/flex"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xmlns:lang="http://www.springframework.org/schema/lang"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="
+    	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    	http://www.springframework.org/schema/flex http://www.springframework.org/schema/flex/spring-flex-1.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+        http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+        ">
+
+    <context:component-scan base-package="org.poc.hbpersist" />
+
+	<bean id="dataSource_dev"
+        class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        	<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+		    <property name="url" value="jdbc:oracle:thin:@localhost:1521:orcl"/>
+		    <property name="username" value="local_dev"/>
+		    <property name="password" value="password"/>
+		    <property name="maxActive" value="8"/> 
+		    <property name="maxIdle" value="4"/> 
+		    <property name="maxWait" value="1000"/>
+		    <property name="testWhileIdle" value="true"/>
+		    <property name="removeAbandoned" value="true"/>
+		    <property name="logAbandoned" value="true"/>
+		    <property name="validationQuery" value="SELECT 1 FROM DUAL"/>     	        	    
+    </bean>
+
+    <bean id="sessionFactoryDev"
+        class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource_dev" />
+        <property name="configLocation">
+            <value>classpath:hibernate.cfg.xml</value>
+        </property>
+        <property name="configurationClass">
+            <value>org.hibernate.cfg.AnnotationConfiguration</value>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+            	<prop key="hibernate.dialect">org.hibernate.dialect.OracleDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+   
+    <tx:annotation-driven transaction-manager="transactionManagerDev"/>
+    <bean id="transactionManagerDev"
+        class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactoryDev" />
+        <qualifier value="planning-tool-transaction"/>
+    </bean>
+
+</beans>
